@@ -3,7 +3,7 @@ title: "Export owned contacts"
 description: "Download suppression-aware CSV files."
 ---
 
-Call `GET /api/v2/exports?kind=agents&template=hubspot` with your API key. An optional `list` UUID limits the export to one owned list.
+Call `GET /api/v2/exports?kind=agents&template=hubspot` with your API key. An optional `list` UUID limits the export to one owned list. Use `q` to filter by name or company. Export membership is fixed when the request begins.
 
 Templates: `standard`, `hubspot`, `salesforce`, `follow_up_boss`, `apollo`, and `instantly`. CSV fields are quoted and spreadsheet-formula escaped. Location source columns accompany location data. Suppressed email or phone matches are omitted. The download records an audit entry visible in the dashboard.
 

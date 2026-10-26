@@ -406,6 +406,15 @@
               ],
               "default": "standard"
             }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Filter owned records by name or company.",
+            "schema": {
+              "type": "string",
+              "maxLength": 60
+            }
           }
         ]
       }
