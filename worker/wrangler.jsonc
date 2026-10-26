@@ -1,0 +1,14 @@
+{
+  "name": "usagentleads-docs-proxy",
+  "main": "index.mjs",
+  "compatibility_date": "2026-10-26",
+  "account_id": "2d4f469711633220b8e9639b85463af0",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+  "routes": [
+    { "pattern": "www.usagentleads.com/docs*", "zone_name": "usagentleads.com" },
+    { "pattern": "www.usagentleads.com/mintlify-assets/*", "zone_name": "usagentleads.com" },
+    { "pattern": "www.usagentleads.com/_mintlify/*", "zone_name": "usagentleads.com" }
+  ]
+}

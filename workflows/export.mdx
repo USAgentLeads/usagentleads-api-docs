@@ -1,0 +1,12 @@
+---
+title: "Export owned contacts"
+description: "Download suppression-aware CSV files."
+---
+
+Call `GET /api/v2/exports?kind=agents&template=hubspot` with your API key. An optional `list` UUID limits the export to one owned list.
+
+Templates: `standard`, `hubspot`, `salesforce`, `follow_up_boss`, `apollo`, and `instantly`. CSV fields are quoted and spreadsheet-formula escaped. Location source columns accompany location data. Suppressed email or phone matches are omitted. The download records an audit entry visible in the dashboard.
+
+Export limits per file are Free 1,000; Starter 25,000; Growth 50,000; Pro 100,000. API access itself requires Growth or Pro. Exports spend no additional record credits. A failed or interrupted download can be requested again; do not import a partial file.
+
+One-time purchases appear separately in the dashboard file library and keep their original readiness and download-expiry rules.

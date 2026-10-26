@@ -1,0 +1,10 @@
+---
+title: "Billing webhooks"
+description: "How subscription changes update your account."
+---
+
+Stripe sends signed billing events to the application. Successful paid invoices grant credits once per service period; eligible upgrades top up the same period's allowance. Duplicate deliveries do not double-grant credits. Expired invoice periods do not grant current-period credits. Full invoice refunds revoke remaining associated credits and block later duplicate grants.
+
+Subscription status changes, cancellations, and payment failures update access through the same subscription record. One-time purchase fulfillment remains independent and retains its durable file-generation and email retries.
+
+Customer-configured outbound webhooks for data alerts are not included in this release. Poll the coverage endpoint for release changes; do not assume an alert subscription exists.

@@ -1,0 +1,25 @@
+---
+title: "MCP integrations"
+description: "Connect a Pro account to an AI assistant."
+---
+
+The Streamable HTTP endpoint is `https://www.usagentleads.com/api/mcp`. It uses the same API key as REST and requires Pro. OAuth is not supported in this release; use an MCP client that supports bearer headers.
+
+```json
+{
+  "mcpServers": {
+    "usagentleads": {
+      "url": "https://www.usagentleads.com/api/mcp",
+      "headers": { "Authorization": "Bearer YOUR_API_KEY" }
+    }
+  }
+}
+```
+
+Replace the credential through your client's secret manager or environment support. Do not commit it. Client configuration syntax varies; consult your client documentation for HTTP headers.
+
+Tools: `coverage`, `count_records`, `preview_records`, `credit_balance`, `owned_records`, `unlock_records`, and `create_export`. `create_export` prepares an authenticated download URL; retrieve it with your key to produce and audit the CSV.
+
+`unlock_records` is marked as a write that spends credits. It requires `confirmCreditSpend: true`, an explicit `maxCredits`, and a UUID `idempotencyKey`. The client must obtain the user's approval first. Tool annotations help clients display approval controls but do not themselves prove human approval.
+
+Source and a local stdio bridge: [usagentleads-mcp](https://github.com/USAgentLeads/usagentleads-mcp).

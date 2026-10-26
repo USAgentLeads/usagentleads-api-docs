@@ -1,0 +1,97 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "USAgentLeads",
+  "description": "Real estate agent and brokerage API, credits, exports, and MCP integrations.",
+  "colors": {
+    "primary": "#6D5EF5",
+    "light": "#8B80FF",
+    "dark": "#5546D9"
+  },
+  "logo": {
+    "light": "/logo.svg",
+    "dark": "/logo.svg",
+    "href": "https://www.usagentleads.com"
+  },
+  "favicon": "/favicon.png",
+  "banner": {
+    "content": "API v2 and hosted MCP are prepared for the next app release. Application deployment is pending UI review."
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Start here",
+            "pages": [
+              "index",
+              "quickstart",
+              "authentication",
+              "plans-and-credits",
+              "data-quality"
+            ]
+          },
+          {
+            "group": "Workflows",
+            "pages": [
+              "workflows/unlock",
+              "workflows/export",
+              "integrations/mcp",
+              "integrations/agent-skills",
+              "webhooks",
+              "errors"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "REST v2",
+            "pages": [
+              "api-reference/coverage",
+              "api-reference/count",
+              "api-reference/preview",
+              "api-reference/credits",
+              "api-reference/records",
+              "api-reference/unlock",
+              "api-reference/exports"
+            ]
+          },
+          {
+            "group": "Legacy",
+            "pages": [
+              "api-reference/legacy-v1"
+            ]
+          }
+        ],
+        "openapi": "openapi.json"
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Dashboard",
+        "href": "https://www.usagentleads.com/dashboard"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get an API key",
+      "href": "https://www.usagentleads.com/dashboard/api/keys"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/USAgentLeads/usagentleads-api-docs"
+    }
+  },
+  "api": {
+    "playground": {
+      "display": "interactive"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+---
+title: "Unlock records safely"
+description: "Preview, confirm, and retry without duplicate spending."
+---
+
+1. Preview the audience and keep its `releaseId` and row ordinals.
+2. Confirm the selection and maximum spend. One agent costs 1 credit; one brokerage costs 2.
+3. Generate a UUID `idempotencyKey` and save it with the exact request.
+4. Submit the request once. On timeout or 5xx, retry the same key and payload.
+
+```json
+{
+  "kind": "agents",
+  "releaseId": "RELEASE_FROM_PREVIEW",
+  "ordinals": [1, 2],
+  "maxCredits": 2,
+  "idempotencyKey": "11111111-1111-4111-8111-111111111111"
+}
+```
+
+Use either up to 100 explicit ordinals, or `filters` with `quantity` (up to 5,000), never both. Bulk unlock selects the first unowned contact-bearing matches in catalog order. A successful retry returns the original receipt; changing the payload with the same key is rejected. A release mismatch requires a fresh preview before a new operation.
+
+The response contains counts and a balance. Read the contacts with `/records` or export them with `/exports`. Agents must obtain authorization for the selection and spending cap before calling the MCP unlock tool.

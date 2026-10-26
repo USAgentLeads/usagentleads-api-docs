@@ -1,0 +1,17 @@
+---
+title: "Errors and retries"
+description: "Resolve failures without repeating a credit spend."
+---
+
+| HTTP status | Action |
+| --- | --- |
+| 400 | Correct the schema or selection. |
+| 401 | Check, rotate, or replace the API key. |
+| 402 | Insufficient record credits; stop and review billing. |
+| 403 | Plan does not permit the operation. |
+| 404 | Check the endpoint and release availability. |
+| 409 | Review the release or credit cap; never change an ambiguous request's key. |
+| 429 | Respect `Retry-After` and monthly quota headers. |
+| 5xx / timeout | Retry with backoff; unlock retries must use the same key and payload. |
+
+Successful API responses include monthly quota limit and remaining headers. Credit balance is separate and available from `/credits`. Do not log contact data, keys, or full request bodies when collecting diagnostics.

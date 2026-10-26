@@ -1,0 +1,1 @@
+{"name":"usagentleads-api-docs","version":"1.0.0","private":true,"type":"module","scripts":{"validate":"node scripts/validate.mjs","preview":"npx mint dev"},"devDependencies":{"@apidevtools/swagger-parser":"12.0.0","@mdx-js/mdx":"3.1.1"}}

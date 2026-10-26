@@ -1,0 +1,9 @@
+# USAgentLeads
+
+API v2 and MCP application deployment is pending UI review.
+
+- [Introduction](https://www.usagentleads.com/docs)
+- [Authentication](https://www.usagentleads.com/docs/authentication)
+- [Plans and credits](https://www.usagentleads.com/docs/plans-and-credits)
+- [OpenAPI](https://www.usagentleads.com/docs/openapi.json)
+- [MCP](https://www.usagentleads.com/docs/integrations/mcp)

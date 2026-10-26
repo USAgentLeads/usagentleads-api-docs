@@ -1,0 +1,10 @@
+---
+title: "Authentication"
+description: "Protect your account with server-side API keys."
+---
+
+Send `Authorization: Bearer YOUR_API_KEY` or `X-API-Key: YOUR_API_KEY` on API requests. Never put keys in URLs or frontend code. Keep up to three active keys; revoke keys immediately when they are exposed or no longer needed. Only the key hash is stored after creation.
+
+Growth and Pro can create keys. Legacy Pro API keys continue to work. Plan access is checked on every request; expired, revoked, or inactive subscription credentials are rejected. Browser session cookies are used by dashboard endpoints, not as substitutes for API keys.
+
+The public `/api/v2/coverage` endpoint needs no key. Cross-origin browser clients should call through their own server so the credential remains private.

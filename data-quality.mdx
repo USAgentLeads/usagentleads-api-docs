@@ -1,0 +1,10 @@
+---
+title: "Coverage and data quality"
+description: "Understand contact and geography limitations."
+---
+
+Use `/api/v2/coverage` for current release and aggregate field coverage. Search counts show how many records actually have the requested fields.
+
+Contacts are format-checked, not verified for deliverability or reachability. Phone numbers can be shared office lines; they are not guaranteed mobile or direct numbers. Data is not scrubbed against DNC lists. License status reflects the catalog observation, not a live licensing-board verification. There is no production-volume or transaction-ranking data.
+
+Address, city, ZIP, and county coverage vary by state. Exported location fields include source attribution where available. The catalog excludes sources restricted to internal use. The export endpoint applies your account suppression list. Use data only in accordance with the terms and applicable outreach requirements.
