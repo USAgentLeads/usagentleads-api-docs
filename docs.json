@@ -15,7 +15,7 @@
   },
   "favicon": "/favicon.png",
   "banner": {
-    "content": "API v2 and hosted MCP are prepared for the next app release. Application deployment is pending UI review."
+    "content": "API v2 and hosted MCP are coming soon. Existing purchases and legacy API access remain available."
   },
   "navigation": {
     "tabs": [
