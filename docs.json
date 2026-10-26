@@ -66,8 +66,7 @@
               "api-reference/legacy-v1"
             ]
           }
-        ],
-        "openapi": "openapi.json"
+        ]
       }
     ]
   },

@@ -327,10 +327,41 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UnlockRequest"
+              },
+              "examples": {
+                "selected": {
+                  "summary": "Unlock approved preview ordinals",
+                  "value": {
+                    "kind": "agents",
+                    "releaseId": "release-id-from-preview",
+                    "maxCredits": 1,
+                    "idempotencyKey": "aa80a81a-f7c1-4c45-8b70-64c25e7143d2",
+                    "ordinals": [
+                      1
+                    ]
+                  }
+                },
+                "filter": {
+                  "summary": "Unlock up to ten matching agents",
+                  "value": {
+                    "kind": "agents",
+                    "releaseId": "release-id-from-preview",
+                    "maxCredits": 10,
+                    "idempotencyKey": "d166fb72-931f-4c7d-a2fa-f7187453741c",
+                    "filters": {
+                      "state": "CA",
+                      "mustHave": [
+                        "email"
+                      ]
+                    },
+                    "quantity": 10
+                  }
+                }
               }
             }
           }
-        }
+        },
+        "description": "Requires Pro. Choose either ordinals or filters plus quantity. Preview and approve the credit budget first. Generate a fresh UUID for each new operation and keep that same UUID when retrying it."
       }
     },
     "/exports": {
@@ -502,80 +533,91 @@
         "additionalProperties": false
       },
       "UnlockRequest": {
-        "type": "object",
-        "required": [
-          "kind",
-          "releaseId",
-          "maxCredits",
-          "idempotencyKey"
-        ],
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "agents",
-              "brokerages"
-            ]
-          },
-          "releaseId": {
-            "type": "string"
-          },
-          "maxCredits": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000
-          },
-          "idempotencyKey": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "ordinals": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "minItems": 1,
-            "maxItems": 100
-          },
-          "filters": {
-            "$ref": "#/components/schemas/Filters"
-          },
-          "quantity": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 5000
-          }
-        },
         "oneOf": [
           {
+            "title": "Selected records",
+            "type": "object",
+            "additionalProperties": false,
             "required": [
+              "kind",
+              "releaseId",
+              "maxCredits",
+              "idempotencyKey",
               "ordinals"
             ],
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "filters"
-                  ]
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "agents",
+                  "brokerages"
+                ]
+              },
+              "releaseId": {
+                "type": "string",
+                "description": "Use the exact releaseId returned by the preview you approved."
+              },
+              "maxCredits": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "idempotencyKey": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "ordinals": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
                 },
-                {
-                  "required": [
-                    "quantity"
-                  ]
-                }
-              ]
+                "minItems": 1,
+                "maxItems": 100
+              }
             }
           },
           {
+            "title": "Filter selection",
+            "type": "object",
+            "additionalProperties": false,
             "required": [
+              "kind",
+              "releaseId",
+              "maxCredits",
+              "idempotencyKey",
               "filters",
               "quantity"
             ],
-            "not": {
-              "required": [
-                "ordinals"
-              ]
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "agents",
+                  "brokerages"
+                ]
+              },
+              "releaseId": {
+                "type": "string",
+                "description": "Use the exact releaseId returned by the preview you approved."
+              },
+              "maxCredits": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "idempotencyKey": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "filters": {
+                "$ref": "#/components/schemas/Filters"
+              },
+              "quantity": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5000
+              }
             }
           }
         ]
