@@ -15,7 +15,7 @@
   },
   "favicon": "/favicon.png",
   "banner": {
-    "content": "API v2 and hosted MCP are coming soon. Existing purchases and legacy API access remain available."
+    "content": "API v2 and hosted MCP are live. The updated credit dashboard and new plan selection are coming soon."
   },
   "navigation": {
     "tabs": [
@@ -81,7 +81,7 @@
     "primary": {
       "type": "button",
       "label": "Get an API key",
-      "href": "https://www.usagentleads.com/dashboard/api/keys"
+      "href": "https://www.usagentleads.com/dashboard/api-keys"
     }
   },
   "footer": {
