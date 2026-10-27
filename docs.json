@@ -4,19 +4,16 @@
   "name": "USAgentLeads",
   "description": "Real estate agent and brokerage API, credits, exports, and MCP integrations.",
   "colors": {
-    "primary": "#6D5EF5",
-    "light": "#8B80FF",
-    "dark": "#5546D9"
+    "primary": "#1D4ED8",
+    "light": "#60A5FA",
+    "dark": "#1E40AF"
   },
   "logo": {
     "light": "/logo.svg",
-    "dark": "/logo.svg",
+    "dark": "/logo-dark.svg",
     "href": "https://www.usagentleads.com"
   },
   "favicon": "/favicon.png",
-  "banner": {
-    "content": "API v2 and hosted MCP are live. The updated credit dashboard and new plan selection are coming soon."
-  },
   "navigation": {
     "tabs": [
       {
