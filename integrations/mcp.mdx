@@ -9,4 +9,4 @@ New tools include `search_agents`, `search_brokerages`, `lookup_agents`, `lookup
 
 Billable tools require `max_credits`, a saved UUID `idempotency_key`, and `confirm_credit_spend: true`. Obtain the user's approval for the selection and maximum spend before setting confirmation. Retrying must preserve the same key and arguments. `export_download` returns an authenticated download URL; it never places the API key in that URL.
 
-The stdio package uses the same generated tool schemas and maps new tools to REST v3. Its legacy tool names remain available for existing integrations. The hosted transport accepts POST; GET and DELETE return 405.
+The stdio package uses the same generated tool schemas and maps all 16 tools to REST v3. The hosted transport accepts POST; GET and DELETE return 405.

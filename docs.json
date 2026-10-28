@@ -28,7 +28,7 @@
               "plans-and-credits",
               "data-quality",
               "rate-limits",
-              "migration-v3"
+              "search-and-recovery"
             ]
           },
           {
@@ -77,24 +77,6 @@
               "api-reference/export-status",
               "api-reference/export-download",
               "api-reference/export-cancel"
-            ]
-          },
-          {
-            "group": "Legacy v2",
-            "pages": [
-              "api-reference/coverage",
-              "api-reference/count",
-              "api-reference/preview",
-              "api-reference/credits",
-              "api-reference/records",
-              "api-reference/unlock",
-              "api-reference/exports"
-            ]
-          },
-          {
-            "group": "Legacy v1",
-            "pages": [
-              "api-reference/legacy-v1"
             ]
           }
         ]

@@ -5,7 +5,7 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { compile } from '@mdx-js/mdx';
 const config=JSON.parse(fs.readFileSync('docs.json','utf8'));
 const specs={};
-for(const name of ['openapi.json','openapi-v2.json']) {
+for(const name of ['openapi.json']) {
   await SwaggerParser.validate(name);
   specs[name]=JSON.parse(fs.readFileSync(name,'utf8'));
 }
@@ -18,4 +18,4 @@ for(const page of pages) {
   await compile(source.replace(/^---\n[\s\S]*?\n---\n/,''));
 }
 for(const file of [config.logo.light,config.logo.dark,config.favicon])assert(fs.existsSync(path.join('.',file)),'Missing asset '+file);
-console.log('Validated both OpenAPI versions, '+pages.length+' MDX pages, operation links and brand assets');
+console.log('Validated OpenAPI v3, '+pages.length+' MDX pages, operation links and brand assets');

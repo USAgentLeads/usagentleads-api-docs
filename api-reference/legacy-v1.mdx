@@ -1,8 +1,0 @@
----
-title: "Legacy API v1"
-description: "Existing Pro API subscriptions retain their agent endpoint."
----
-
-`GET https://www.usagentleads.com/api/v1/agents` remains available to existing `pro_api` subscriptions. Parameters: `state`, `search`, `page`, and `pageSize` (25–100). Authenticate with the same key headers. The legacy endpoint has its existing 10,000 monthly request quota and 60 requests per minute per key.
-
-New integrations on Growth and Pro should use API v3 after its deployment. The legacy endpoint is not used to bypass the new record-credit model. One-time purchases continue through the existing checkout and download routes.

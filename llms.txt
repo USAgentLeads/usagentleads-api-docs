@@ -1,6 +1,6 @@
 # USAgentLeads developer documentation
 
-V3 is available for Growth and Pro accounts; v2 remains available.
+V3 is available for Growth and Pro accounts.
 Base URL: https://www.usagentleads.com/api/v3
 MCP: https://www.usagentleads.com/api/mcp
 REST v3 and MCP: Growth and Pro.

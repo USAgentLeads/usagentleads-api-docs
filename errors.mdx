@@ -11,6 +11,6 @@ title: "Errors and retries"
 | 429 | Wait at least Retry-After; obey account, IP, concurrency and monthly quotas |
 | 503 / network timeout | Retry with the exact saved key and payload, or recover the request |
 
-Errors include a machine code and message; legacy authentication/quota responses may use a string `error`.
+Errors include a machine code and message; authentication/quota responses may use a string `error`.
 
 Do not treat a network failure as proof that no charge occurred. `GET /api/v3/requests/{idempotency-key}` retrieves the account-scoped receipt for 30 days. An unknown receipt returns 404; if the first request may still be running, retry the original request. Expired keys return 410 and cannot be reused. Use a new key only for a deliberately new operation.

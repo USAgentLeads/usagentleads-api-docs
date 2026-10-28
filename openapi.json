@@ -3,7 +3,7 @@
   "info": {
     "title": "USAgentLeads API",
     "version": "3.0.0",
-    "description": "Search and retrieve agent and brokerage contacts with shared account credits, safe retries, and asynchronous exports. v2 remains available separately."
+    "description": "Search and retrieve agent and brokerage contacts with shared account credits, safe retries, and asynchronous exports."
   },
   "servers": [
     {
