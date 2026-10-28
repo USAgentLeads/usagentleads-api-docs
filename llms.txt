@@ -1,9 +1,12 @@
-# USAgentLeads
+# USAgentLeads developer documentation
 
-API v2 and MCP application deployment is pending UI review.
-
-- [Introduction](https://www.usagentleads.com/docs)
-- [Authentication](https://www.usagentleads.com/docs/authentication)
-- [Plans and credits](https://www.usagentleads.com/docs/plans-and-credits)
-- [OpenAPI](https://www.usagentleads.com/docs/openapi.json)
-- [MCP](https://www.usagentleads.com/docs/integrations/mcp)
+V3 is available for Growth and Pro accounts; v2 remains available.
+Base URL: https://www.usagentleads.com/api/v3
+MCP: https://www.usagentleads.com/api/mcp
+REST v3 and MCP: Growth and Pro.
+Direct search/lookup: agents 1 credit, brokerages 2; already-owned records cost zero.
+Free record-credit operations: count, preview, coverage, locations, account, usage, request recovery, job status, cancellation and repeat download.
+Every API is rate-limited; account REST/MCP limit 60 requests/minute; Growth 10k and Pro 100k successful/in-flight requests per UTC month.
+Billable POST: saved UUID Idempotency-Key header and max_credits body. Reuse both exactly on retries.
+Contact fields are format-checked, not deliverability or consent guarantees.
+See /quickstart, /plans-and-credits, /rate-limits, /migration-v3 and the audience-specific API references.

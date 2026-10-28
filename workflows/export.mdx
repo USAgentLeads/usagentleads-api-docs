@@ -1,12 +1,20 @@
 ---
-title: "Export owned contacts"
-description: "Download suppression-aware CSV files."
+title: "Export contacts"
 ---
+Submit `POST /api/v3/exports` with a UUID `Idempotency-Key`, `kind`, filters or IDs, `limit`, `max_credits`, and `format` (csv or json).
 
-Call `GET /api/v2/exports?kind=agents&template=hubspot` with your API key. An optional `list` UUID limits the export to one owned list. Use `q` to filter by name or company. Export membership is fixed when the request begins.
+```json
+{"kind":"brokerages","filters":{"state":"CA","orgType":"brokerage"},"limit":1000,"max_credits":2000,"format":"csv","template":"hubspot"}
+```
 
-Templates: `standard`, `hubspot`, `salesforce`, `follow_up_boss`, `apollo`, and `instantly`. CSV fields are quoted and spreadsheet-formula escaped. Location source columns accompany location data. Suppressed email or phone matches are omitted. The download records an audit entry visible in the dashboard.
+The 202 response includes `export_id`, `request_id`, `snapshot_id`, and `selected_records`. Selection freezes at creation. Credits are checked and settled when the result is durably prepared; no credits are held while queued.
 
-Export limits per file are Free 1,000; Starter 25,000; Growth 50,000; Pro 100,000. API access itself requires Growth or Pro. Exports spend no additional record credits. A failed or interrupted download can be requested again; do not import a partial file.
+Poll `GET /exports/{id}`. Once ready, download with `GET /exports/{id}/download` and the same account's API key. Downloads never acquire additional contacts. Cancel queued work with `POST /exports/{id}/cancel`; completed preparation cannot be cancelled.
 
-One-time purchases appear separately in the dashboard file library and keep their original readiness and download-expiry rules.
+CSV templates: standard, hubspot, salesforce, follow_up_boss, apollo and instantly. These are import formats, not live integrations. All include required location attribution and spreadsheet-safe escaping.
+
+Jobs expire if preparation has not started within 24 hours, retry transient failures up to eight attempts, and fail without acquisition if credits are insufficient or the cap is exceeded. Results expire 30 days after preparation. Later suppressions apply to JSON and CSV downloads.
+
+The deployment must enable the protected export cron. Local development requires explicitly invoking the worker; running the dev server alone does not process jobs.
+
+Status record_count reports records prepared originally; later suppressions can reduce download rows.

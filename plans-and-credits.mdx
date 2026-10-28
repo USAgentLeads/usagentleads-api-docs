@@ -1,19 +1,20 @@
 ---
 title: "Plans and credits"
-description: "One shared credit balance across dashboard, REST, and MCP."
 ---
+| Operation | Record credits |
+| --- | --- |
+| Search or lookup returning a new agent | 1 per record |
+| Search or lookup returning a new brokerage | 2 per record |
+| Repeat access to records acquired through dashboard, REST or MCP | 0 |
+| Count, preview, coverage, locations, account, usage and request recovery | 0 |
+| Export creation, polling, cancellation and repeat download | 0 |
+| Export preparation | Only newly acquired records |
+| Missing, suppressed or contactless records | 0 |
 
-| Plan | Monthly | Annual total | Credits per month | API |
-| --- | --- | --- | --- | --- |
-| Free | $0 | — | 50 | None |
-| Starter | $49 | $468 | 1,000 | None |
-| Growth | $149 | $1,428 | 5,000 | Read access |
-| Pro | $399 | $3,828 | 20,000 | Read, unlock, MCP |
+Growth includes 10,000 successful/in-flight API requests per UTC month; Pro includes 100,000. Both include REST v3 and MCP. Monthly request quotas, record credits and per-minute limits are separate. Failed HTTP requests do not count toward the successful-request quota; MCP protocol requests and successful tool-response envelopes do.
 
-Annual billing grants 12 months of credits upfront. Paid credits expire at the billing period end. Free credits reset each UTC calendar month and do not roll over. There are no credit top-up packs.
+A synchronous request is all-or-nothing: exceeding `max_credits` returns 409; insufficient balance returns 402. Neither acquires part of the selection. Set `max_credits: 0` when you only permit already-owned data.
 
-One credit unlocks an agent; two unlock a brokerage. Already-owned records and records without email or phone cost zero. Unlocking gives all available record fields; missing fields are not invented. Re-exporting owned contacts spends no additional credits.
+An export freezes its selection at creation and charges at preparation. It does not reserve credits while queued. If the balance is insufficient then, the job fails without acquiring records. Cancel before preparation to avoid spending.
 
-API request quotas are separate from credits: Growth and legacy Pro API have 10,000 requests per UTC month; Pro has 100,000. API v2 and MCP share an account limit of 60 requests per minute. MCP protocol requests also count toward request usage.
-
-One-time state, county, brokerage, national, and custom-list purchases remain separate purchases with their existing download terms. They do not add subscription credits or automatically unlock equivalent dashboard rows. Legacy Pro Dashboard and Pro API subscriptions retain their prices and map to Starter and Growth allowances respectively. Manage changes and cancellation through the Stripe billing portal.
+A response's `credits.charged` records the original transaction. A replay returns that historical receipt and never charges it again. Results remain recoverable for 30 days; expired keys remain tombstoned and cannot be reused.

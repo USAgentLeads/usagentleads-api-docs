@@ -1,18 +1,29 @@
 ---
 title: "Quickstart"
-description: "Preview an audience before spending credits."
+description: "Get contact details in one request."
 ---
 
-1. [Sign in](https://www.usagentleads.com/login?next=%2Fdashboard%2Fapi-keys) using Google or an email magic link.
-2. API v2 read access requires Growth, Pro, or an existing Pro API subscription. API unlocks and MCP require Pro. Self-service selection of new plans will arrive with the updated dashboard; [contact support](https://www.usagentleads.com/contact) for account setup during the rollout.
-3. Create an API key in [API settings](https://www.usagentleads.com/dashboard/api-keys). Copy it once and store it in an environment variable.
+Create a key in [API settings](https://www.usagentleads.com/dashboard/api/keys) on Growth or Pro. Store it as an environment variable.
+
+Save a UUID and the exact request body before calling a billable endpoint. This example retrieves up to 25 California agents and permits at most 25 credits:
 
 ```bash
 export USAGENTLEADS_API_KEY='your-key'
-curl --fail-with-body https://www.usagentleads.com/api/v2/search/preview \
+# Generate once; save this value and the body for retries.
+export REQUEST_ID="$(python3 -c 'import uuid; print(uuid.uuid4())')"
+curl --fail-with-body https://www.usagentleads.com/api/v3/agents/search \
   -H "Authorization: Bearer $USAGENTLEADS_API_KEY" \
+  -H "Idempotency-Key: $REQUEST_ID" \
   -H 'Content-Type: application/json' \
-  --data '{"kind":"agents","filters":{"state":"CA","mustHave":["email"]}}'
+  --data '{"filters":{"state":"CA","mustHave":["email"]},"limit":25,"max_credits":25}'
 ```
 
-The result includes `releaseId`, total and field counts, and masked rows with release-scoped `ordinal` identifiers. A preview does not spend record credits. Follow [the unlock workflow](/workflows/unlock) only after confirming the audience and maximum spend.
+The response contains `records`, `credits`, `request_id`, `snapshot_id` and `next_cursor`. Contact fields are returned directly; unavailable fields are null.
+
+Use `/brokerages/search` for offices, teams and brokerages; 25 new records require at most 50 credits.
+
+For the next page, keep the filters, limit and `exclude_owned` unchanged, pass `next_cursor` as `cursor`, and save a new request ID for that new page. Retrying an existing page uses its original ID and body. Cursors last 24 hours from the first page and remain pinned to that snapshot.
+
+Optional: call `POST /agents/count` or `POST /agents/preview` first. Those calls cost zero record credits. Preview IDs can be passed directly to `POST /agents/lookup`.
+
+On a timeout, retry the identical request or call `GET /requests/{request_id}`. Never generate a new key just because the response was lost.

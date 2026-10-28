@@ -1,17 +1,16 @@
 ---
 title: "Errors and retries"
-description: "Resolve failures without repeating a credit spend."
 ---
-
-| HTTP status | Action |
+| Status | Action |
 | --- | --- |
-| 400 | Correct the schema or selection. |
-| 401 | Check, rotate, or replace the API key. |
-| 402 | Insufficient record credits; stop and review billing. |
-| 403 | Plan does not permit the operation. |
-| 404 | Check the endpoint and release availability. |
-| 409 | Review the release or credit cap; never change an ambiguous request's key. |
-| 429 | Respect `Retry-After` and monthly quota headers. |
-| 5xx / timeout | Retry with backoff; unlock retries must use the same key and payload. |
+| 400 | Correct validation errors; unsupported filters and extra identity fields are rejected |
+| 401 / 403 | Check credentials, key expiry and API plan |
+| 402 | Insufficient credits; no partial acquisition |
+| 409 | Check credit cap, changed idempotency payload, cursor mismatch or export readiness |
+| 410 | Cursor, catalog snapshot or stored result expired |
+| 429 | Wait at least Retry-After; obey account, IP, concurrency and monthly quotas |
+| 503 / network timeout | Retry with the exact saved key and payload, or recover the request |
 
-Successful API responses include monthly quota limit and remaining headers. Credit balance is separate and available from `/credits`. Do not log contact data, keys, or full request bodies when collecting diagnostics.
+Errors include a machine code and message; legacy authentication/quota responses may use a string `error`.
+
+Do not treat a network failure as proof that no charge occurred. `GET /api/v3/requests/{idempotency-key}` retrieves the account-scoped receipt for 30 days. An unknown receipt returns 404; if the first request may still be running, retry the original request. Expired keys return 410 and cannot be reused. Use a new key only for a deliberately new operation.

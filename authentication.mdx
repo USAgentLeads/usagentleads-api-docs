@@ -1,10 +1,8 @@
 ---
 title: "Authentication"
-description: "Protect your account with server-side API keys."
 ---
+Use `Authorization: Bearer YOUR_API_KEY` or `X-API-Key: YOUR_API_KEY`. Create, revoke and rotate keys in the dashboard. Never put keys in query strings, source code, logs, generated CSVs or MCP prompts.
 
-Send `Authorization: Bearer YOUR_API_KEY` or `X-API-Key: YOUR_API_KEY` on API requests. Never put keys in URLs or frontend code. Keep up to three active keys; revoke keys immediately when they are exposed or no longer needed. Only the key hash is stored after creation.
+Growth and Pro can use all v3 endpoints and hosted MCP. Coverage and location suggestions also support unauthenticated requests. The account behind the key determines ownership, credit balance, quotas, suppressions and request recovery; client-supplied user IDs are rejected.
 
-Growth and Pro can create keys. Legacy Pro API keys continue to work. Plan access is checked on every request; expired, revoked, or inactive subscription credentials are rejected. Browser session cookies are used by dashboard endpoints, not as substitutes for API keys.
-
-The public `/api/v2/coverage` endpoint needs no key. Cross-origin browser clients should call through their own server so the credential remains private.
+Billable POST requests require a UUID `Idempotency-Key` header and an explicit `max_credits` body value. MCP uses `idempotency_key`, `max_credits` and `confirm_credit_spend: true`.

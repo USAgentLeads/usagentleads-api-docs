@@ -1,0 +1,6 @@
+---
+title: "Cancel an export"
+openapi: "openapi.json POST /exports/{id}/cancel"
+---
+
+Cancel queued work without spending credits. If preparation wins the race, cancellation returns 409 and the prepared result remains available.

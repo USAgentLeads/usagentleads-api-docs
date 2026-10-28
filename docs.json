@@ -26,7 +26,9 @@
               "quickstart",
               "authentication",
               "plans-and-credits",
-              "data-quality"
+              "data-quality",
+              "rate-limits",
+              "migration-v3"
             ]
           },
           {
@@ -46,7 +48,39 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "REST v2",
+            "group": "Agents",
+            "pages": [
+              "api-reference/agents-search",
+              "api-reference/agents-lookup",
+              "api-reference/agents-count",
+              "api-reference/agents-preview"
+            ]
+          },
+          {
+            "group": "Brokerages",
+            "pages": [
+              "api-reference/brokerages-search",
+              "api-reference/brokerages-lookup",
+              "api-reference/brokerages-count",
+              "api-reference/brokerages-preview"
+            ]
+          },
+          {
+            "group": "Account and exports",
+            "pages": [
+              "api-reference/v3-coverage",
+              "api-reference/locations",
+              "api-reference/account",
+              "api-reference/usage",
+              "api-reference/request-recovery",
+              "api-reference/create-export",
+              "api-reference/export-status",
+              "api-reference/export-download",
+              "api-reference/export-cancel"
+            ]
+          },
+          {
+            "group": "Legacy v2",
             "pages": [
               "api-reference/coverage",
               "api-reference/count",
@@ -58,7 +92,7 @@
             ]
           },
           {
-            "group": "Legacy",
+            "group": "Legacy v1",
             "pages": [
               "api-reference/legacy-v1"
             ]
@@ -77,7 +111,7 @@
     "primary": {
       "type": "button",
       "label": "Get an API key",
-      "href": "https://www.usagentleads.com/dashboard/api-keys"
+      "href": "https://www.usagentleads.com/dashboard/api/keys"
     }
   },
   "footer": {

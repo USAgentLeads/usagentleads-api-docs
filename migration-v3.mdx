@@ -1,0 +1,23 @@
+---
+title: "Migrate from v2"
+---
+V2 remains available with its existing paths and unlock behavior. New integrations should use v3 after deployment.
+
+| v2 workflow | v3 replacement |
+| --- | --- |
+| Preview → unlock → find owned contacts | `POST /agents/search` or `POST /brokerages/search` returns contacts directly |
+| Release-scoped ordinals | Stable catalog record IDs from preview/search; `POST /{kind}/lookup` |
+| `GET /records` only returns owned data | Search/lookup can acquire new data within the requested cap |
+| `GET /exports` only exports owned data | `POST /exports` queues a frozen selection of new or owned data |
+| Body `idempotencyKey`, `maxCredits` | UUID `Idempotency-Key` header, `max_credits` body |
+| Page/offset | Account- and query-bound opaque cursor, pinned to a snapshot |
+
+V3 exposes separate agent and brokerage endpoints. Geography and availability filters retain dashboard names: `state`, `countyFips`, `city` (requires state), `zip`, `mustHave`, and `organization`. Agents also support `activeLicense`; brokerages support `orgType`. Unsupported audience filters are rejected. `mustHave` accepts email, phone, address, license and fullAddress. Name/domain fuzzy matching and sales-volume filters are not available.
+
+Ownership uses the catalog's stable ID within each audience. A source identity correction can produce a new ID; it is not a guaranteed universal person/company identifier. An agent's organization text is not a guaranteed foreign key to a brokerage record.
+
+REST v2 retains Growth read access and Pro unlock access. Hosted MCP now admits Growth for v3 tools; legacy `unlock_records` still requires Pro. Existing MCP tool names remain available; use the new `search_agents`, `search_brokerages`, lookup, count and preview tools for direct access.
+
+Successful replay selection and the pinned snapshot stay fixed. Later account suppression changes can withhold records from replay/download; original charges are not rewritten. `withheld_since_delivery` reports this. Suppression changes and new ownership can alter later pages when `exclude_owned` is enabled, but ordinal cursors do not revisit earlier rows.
+
+Retain snapshots while cursors (24 hours) or queued exports reference them. Removed snapshots and expired cursors return 410. Saved delivery payloads are independent of catalog retention and expire after 30 days.
