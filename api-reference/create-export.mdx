@@ -3,4 +3,4 @@ title: "Create an export"
 openapi: "openapi.json POST /exports"
 ---
 
-Queue up to 5,000 records selected by filters or IDs. The selection is frozen at creation. No upfront credit reservation: credits settle atomically when the result is prepared. A lower balance at preparation fails the job with no acquisition. Store and reuse the same request key.
+Queue up to 5,000 records selected by filters or IDs. Agent filters support name with location, brokerage and fullAddress availability constraints. The selection is frozen at creation. No upfront credit reservation: credits settle atomically when the result is prepared. A lower balance at preparation fails the job with no acquisition. Store and reuse the same request key.

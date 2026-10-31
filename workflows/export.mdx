@@ -7,6 +7,8 @@ Submit `POST /api/v3/exports` with a UUID `Idempotency-Key`, `kind`, filters or 
 {"kind":"brokerages","filters":{"state":"CA","orgType":"brokerage"},"limit":1000,"max_credits":2000,"format":"csv","template":"hubspot"}
 ```
 
+To export specific agents, first [look up candidates by name](/search-and-recovery#look-up-an-agent-by-name), review the matches and submit their IDs. Agent exports also accept `filters.name`; combine it with `mustHave: ["fullAddress"]` when you need complete recorded business addresses. A name filter can match several people and is not an identity confirmation.
+
 The 202 response includes `export_id`, `request_id`, `snapshot_id`, and `selected_records`. Selection freezes at creation. Credits are checked and settled when the result is durably prepared; no credits are held while queued.
 
 Poll `GET /exports/{id}`. Once ready, download with `GET /exports/{id}/download` and the same account's API key. Downloads never acquire additional contacts. Cancel queued work with `POST /exports/{id}/cancel`; completed preparation cannot be cancelled.

@@ -3,7 +3,42 @@ title: "Search and recovery"
 description: "Filters, record identity, snapshots, and safe request recovery."
 ---
 
-V3 exposes separate agent and brokerage endpoints. Geography and availability filters retain dashboard names: `state`, `countyFips`, `city` (requires state), `zip`, `mustHave`, and `organization`. Agents also support `activeLicense`; brokerages support `orgType`. Unsupported audience filters are rejected. `mustHave` accepts email, phone, address, license and fullAddress. Name/domain fuzzy matching and sales-volume filters are not available.
+V3 exposes separate agent and brokerage endpoints. Geography and availability filters retain dashboard names: `state`, `countyFips`, `city` (requires state), `zip`, `mustHave`, and `organization`. Agents also support `name` and `activeLicense`; brokerages support `orgType`. Unsupported audience filters are rejected. `mustHave` accepts email, phone, address, license and fullAddress. Name matching is a case-insensitive literal substring. Fuzzy matching, domain matching and sales-volume filters are not available.
+
+## Look up an agent by name
+
+Use `filters.name` on agent count, preview, search and export requests. Names must contain 3–160 characters and at least one letter or number. Leading and trailing whitespace is removed. Punctuation and wildcard characters are matched literally, and spelling differences are not corrected. A name can match several records, including people with the same name and multiple records for one person. Add `state`, `city` (with state), `zip` or `organization` to narrow the candidates.
+
+First preview the candidates without spending record credits:
+
+```bash
+curl https://www.usagentleads.com/api/v3/agents/preview \
+  -H "Authorization: Bearer $USAGENTLEADS_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"filters":{"name":"Jane Smith","state":"TX","organization":"Example Realty","mustHave":["fullAddress"]},"limit":10}'
+```
+
+Preview returns candidate IDs, names, state, city, brokerage and contact-availability flags. Email, phone and street-address values remain withheld. Review the candidates, then use `/agents/lookup` with the selected `ids`, or `/exports` with `kind: "agents"` and those IDs. ID lookups accept up to 100 IDs; exports accept up to 5,000. Do not assume the first candidate is the right person.
+
+You can also retrieve candidates directly by supplying `name` to `/agents/lookup`. This spends one credit for **each new returned record**, even when several records share a name. Owned records are free. Supply either `ids` or `name`, never both. With `name`, optional `filters` narrow the selection; put the name at the top level, not inside those filters.
+
+```bash
+# Save this UUID with the request body before sending. Reuse both on a retry.
+request_id="$(uuidgen)"
+curl https://www.usagentleads.com/api/v3/agents/lookup \
+  -H "Authorization: Bearer $USAGENTLEADS_API_KEY" \
+  -H "Idempotency-Key: $request_id" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Jane Smith","filters":{"state":"TX","organization":"Example Realty","mustHave":["fullAddress"]},"limit":10,"max_credits":10}'
+```
+
+Name lookups default to 25 records and allow up to 100 per page. If `next_cursor` is present, send it as `cursor` with the same name, filters and limit and a new saved idempotency key for that next page. Retry an uncertain page with its original key and body. An empty result spends no record credits. If the selection exceeds `max_credits`, the entire request fails without acquiring records.
+
+Returned contacts include available business addresses in `address` and attribution in `location_source`. `mustHave: ["fullAddress"]` requires street, city, state and ZIP; suite is optional. As elsewhere in v3, records must also have an email or phone to be eligible. An address is a recorded business location, not a guarantee of postal deliverability.
+
+For a supplied list, preview each name with its known location or brokerage, review ambiguous matches, and collect the selected IDs for an export. There is no bulk names-array or CSV address-append endpoint. Brokerage endpoints do not accept the agent `name` filter.
+
+## Record identity and recovery
 
 Ownership uses the catalog's stable ID within each audience. A source identity correction can produce a new ID; it is not a guaranteed universal person/company identifier. An agent's organization text is not a guaranteed foreign key to a brokerage record.
 

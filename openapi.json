@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "USAgentLeads API",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "description": "Search and retrieve agent and brokerage contacts with shared account credits, safe retries, and asynchronous exports."
   },
   "servers": [
@@ -20,7 +20,7 @@
       "post": {
         "operationId": "agents_search",
         "summary": "Search agents",
-        "description": "Acquires new contacts using the shared account credits; 1 per agent or 2 per brokerage. Already-owned records are free. Retry the SAME UUID key and body to recover the saved selection.",
+        "description": "Supports filters.name with optional location, brokerage and contact-availability filters. Name matches are candidates, not confirmed identities. Acquires contacts and available business addresses for 1 credit per new record; owned records are free. Save and reuse the same UUID Idempotency-Key and body after a timeout.",
         "parameters": [
           {
             "name": "Idempotency-Key",
@@ -38,7 +38,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Search"
+                "$ref": "#/components/schemas/AgentSearch"
               }
             }
           }
@@ -396,7 +396,7 @@
       "post": {
         "operationId": "agents_lookup",
         "summary": "Lookup agents",
-        "description": "Acquires new contacts using the shared account credits; 1 per agent or 2 per brokerage. Already-owned records are free. Retry the SAME UUID key and body to recover the saved selection.",
+        "description": "Look up up to 100 existing record IDs, or supply name with optional filters and a limit (default 25, maximum 100). Name matching is a case-insensitive literal substring and can return multiple candidates. Preview with filters.name before spending. Each new agent record costs 1 credit; owned records are free. Returned records include available business addresses. Save and reuse the same UUID Idempotency-Key and body after a timeout. See [name lookup](/search-and-recovery#look-up-an-agent-by-name).",
         "parameters": [
           {
             "name": "Idempotency-Key",
@@ -414,7 +414,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Lookup"
+                "$ref": "#/components/schemas/AgentLookup"
               }
             }
           }
@@ -772,14 +772,14 @@
       "post": {
         "operationId": "agents_count",
         "summary": "Count agents",
-        "description": "No record credits. Rate limits and authenticated request quotas still apply.",
+        "description": "Supports filters.name with optional location, brokerage and contact-availability filters. Name matches are candidates, not confirmed identities. No record credits. Contact values are withheld in previews. Rate limits and request quotas apply.",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CountRequest"
+                "$ref": "#/components/schemas/AgentCountRequest"
               }
             }
           }
@@ -1137,14 +1137,14 @@
       "post": {
         "operationId": "agents_preview",
         "summary": "Preview agents",
-        "description": "No record credits. Rate limits and authenticated request quotas still apply.",
+        "description": "Supports filters.name with optional location, brokerage and contact-availability filters. Name matches are candidates, not confirmed identities. No record credits. Contact values are withheld in previews. Rate limits and request quotas apply.",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PreviewRequest"
+                "$ref": "#/components/schemas/AgentPreviewRequest"
               }
             }
           }
@@ -4808,7 +4808,7 @@
       "post": {
         "operationId": "create_export",
         "summary": "Create an export",
-        "description": "Queue up to 5,000 records selected by filters or IDs. The selection is frozen at creation. No upfront credit reservation: credits settle atomically when the result is prepared. A lower balance at preparation fails the job with no acquisition. Store and reuse the same request key.",
+        "description": "Queue up to 5,000 records selected by filters or IDs. Agent filters support name with location, brokerage and fullAddress availability constraints. The selection is frozen at creation. No upfront credit reservation: credits settle atomically when the result is prepared. A lower balance at preparation fails the job with no acquisition. Store and reuse the same request key.",
         "parameters": [
           {
             "name": "Idempotency-Key",
@@ -6289,6 +6289,427 @@
       }
     },
     "schemas": {
+      "AgentSearch": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string"
+              },
+              "countyFips": {
+                "type": "string",
+                "pattern": "^\\d{5}$"
+              },
+              "city": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 60,
+                "pattern": "^[\\p{L}\\p{N} .'-]+$"
+              },
+              "zip": {
+                "type": "string",
+                "pattern": "^\\d{5}$"
+              },
+              "mustHave": {
+                "maxItems": 5,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "phone",
+                    "email",
+                    "address",
+                    "license",
+                    "fullAddress"
+                  ]
+                }
+              },
+              "activeLicense": {
+                "type": "boolean"
+              },
+              "organization": {
+                "type": "string",
+                "maxLength": 60,
+                "pattern": "^[\\p{L}\\p{N} &'.,-]*$"
+              },
+              "orgType": {
+                "type": "string",
+                "enum": [
+                  "brokerage",
+                  "office",
+                  "branch",
+                  "team",
+                  "other"
+                ]
+              },
+              "name": {
+                "description": "Agent name or name fragment, 3–160 characters. Case-insensitive literal substring; no fuzzy matching or unique-identity guarantee.",
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160,
+                "allOf": [
+                  {
+                    "pattern": "[\\p{L}\\p{N}]"
+                  },
+                  {
+                    "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "exclude_owned": {
+            "default": false,
+            "type": "boolean"
+          },
+          "snapshot_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "limit": {
+            "default": 25,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "max_credits": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          }
+        },
+        "required": [
+          "max_credits"
+        ],
+        "additionalProperties": false
+      },
+      "AgentLookup": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "ids": {
+                "minItems": 1,
+                "maxItems": 100,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              },
+              "snapshot_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "max_credits": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 200
+              }
+            },
+            "required": [
+              "ids",
+              "max_credits"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Agent name or name fragment, 3–160 characters. Case-insensitive literal substring; no fuzzy matching or unique-identity guarantee.",
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160,
+                "allOf": [
+                  {
+                    "pattern": "[\\p{L}\\p{N}]"
+                  },
+                  {
+                    "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                  }
+                ]
+              },
+              "filters": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string"
+                  },
+                  "countyFips": {
+                    "type": "string",
+                    "pattern": "^\\d{5}$"
+                  },
+                  "city": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 60,
+                    "pattern": "^[\\p{L}\\p{N} .'-]+$"
+                  },
+                  "zip": {
+                    "type": "string",
+                    "pattern": "^\\d{5}$"
+                  },
+                  "mustHave": {
+                    "maxItems": 5,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "phone",
+                        "email",
+                        "address",
+                        "license",
+                        "fullAddress"
+                      ]
+                    }
+                  },
+                  "activeLicense": {
+                    "type": "boolean"
+                  },
+                  "organization": {
+                    "type": "string",
+                    "maxLength": 60,
+                    "pattern": "^[\\p{L}\\p{N} &'.,-]*$"
+                  },
+                  "orgType": {
+                    "type": "string",
+                    "enum": [
+                      "brokerage",
+                      "office",
+                      "branch",
+                      "team",
+                      "other"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "limit": {
+                "default": 25,
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "cursor": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "snapshot_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "max_credits": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 200
+              }
+            },
+            "required": [
+              "name",
+              "max_credits"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "AgentCountRequest": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string"
+              },
+              "countyFips": {
+                "type": "string",
+                "pattern": "^\\d{5}$"
+              },
+              "city": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 60,
+                "pattern": "^[\\p{L}\\p{N} .'-]+$"
+              },
+              "zip": {
+                "type": "string",
+                "pattern": "^\\d{5}$"
+              },
+              "mustHave": {
+                "maxItems": 5,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "phone",
+                    "email",
+                    "address",
+                    "license",
+                    "fullAddress"
+                  ]
+                }
+              },
+              "activeLicense": {
+                "type": "boolean"
+              },
+              "organization": {
+                "type": "string",
+                "maxLength": 60,
+                "pattern": "^[\\p{L}\\p{N} &'.,-]*$"
+              },
+              "orgType": {
+                "type": "string",
+                "enum": [
+                  "brokerage",
+                  "office",
+                  "branch",
+                  "team",
+                  "other"
+                ]
+              },
+              "name": {
+                "description": "Agent name or name fragment, 3–160 characters. Case-insensitive literal substring; no fuzzy matching or unique-identity guarantee.",
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160,
+                "allOf": [
+                  {
+                    "pattern": "[\\p{L}\\p{N}]"
+                  },
+                  {
+                    "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "exclude_owned": {
+            "default": false,
+            "type": "boolean"
+          },
+          "snapshot_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-z0-9-]+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgentPreviewRequest": {
+        "type": "object",
+        "properties": {
+          "filters": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string"
+              },
+              "countyFips": {
+                "type": "string",
+                "pattern": "^\\d{5}$"
+              },
+              "city": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 60,
+                "pattern": "^[\\p{L}\\p{N} .'-]+$"
+              },
+              "zip": {
+                "type": "string",
+                "pattern": "^\\d{5}$"
+              },
+              "mustHave": {
+                "maxItems": 5,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "phone",
+                    "email",
+                    "address",
+                    "license",
+                    "fullAddress"
+                  ]
+                }
+              },
+              "activeLicense": {
+                "type": "boolean"
+              },
+              "organization": {
+                "type": "string",
+                "maxLength": 60,
+                "pattern": "^[\\p{L}\\p{N} &'.,-]*$"
+              },
+              "orgType": {
+                "type": "string",
+                "enum": [
+                  "brokerage",
+                  "office",
+                  "branch",
+                  "team",
+                  "other"
+                ]
+              },
+              "name": {
+                "description": "Agent name or name fragment, 3–160 characters. Case-insensitive literal substring; no fuzzy matching or unique-identity guarantee.",
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160,
+                "allOf": [
+                  {
+                    "pattern": "[\\p{L}\\p{N}]"
+                  },
+                  {
+                    "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "exclude_owned": {
+            "default": false,
+            "type": "boolean"
+          },
+          "snapshot_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "limit": {
+            "default": 25,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "additionalProperties": false
+      },
       "Search": {
         "type": "object",
         "properties": {
@@ -6617,6 +7038,20 @@
                   "team",
                   "other"
                 ]
+              },
+              "name": {
+                "description": "Agent name or name fragment, 3–160 characters. Case-insensitive literal substring; no fuzzy matching or unique-identity guarantee.",
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 160,
+                "allOf": [
+                  {
+                    "pattern": "[\\p{L}\\p{N}]"
+                  },
+                  {
+                    "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -6943,6 +7378,18 @@
                 },
                 "state": {
                   "type": "string"
+                },
+                "city": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "organization": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "owned": {
                   "type": "boolean"

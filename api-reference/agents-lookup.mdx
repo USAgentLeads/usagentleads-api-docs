@@ -3,4 +3,4 @@ title: "Lookup agents"
 openapi: "openapi.json POST /agents/lookup"
 ---
 
-Acquires new contacts using the shared account credits; 1 per agent or 2 per brokerage. Already-owned records are free. Retry the SAME UUID key and body to recover the saved selection.
+Look up up to 100 existing record IDs, or supply name with optional filters and a limit (default 25, maximum 100). Name matching is a case-insensitive literal substring and can return multiple candidates. Preview with filters.name before spending. Each new agent record costs 1 credit; owned records are free. Returned records include available business addresses. Save and reuse the same UUID Idempotency-Key and body after a timeout. See [name lookup](/search-and-recovery#look-up-an-agent-by-name).

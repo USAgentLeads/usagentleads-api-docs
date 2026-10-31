@@ -3,4 +3,4 @@ title: "Search agents"
 openapi: "openapi.json POST /agents/search"
 ---
 
-Acquires new contacts using the shared account credits; 1 per agent or 2 per brokerage. Already-owned records are free. Retry the SAME UUID key and body to recover the saved selection.
+Supports filters.name with optional location, brokerage and contact-availability filters. Name matches are candidates, not confirmed identities. Acquires contacts and available business addresses for 1 credit per new record; owned records are free. Save and reuse the same UUID Idempotency-Key and body after a timeout.
